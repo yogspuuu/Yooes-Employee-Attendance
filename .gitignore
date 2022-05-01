@@ -16,3 +16,4 @@ yarn-error.log
 /.vagrant
 /engine/datasets/*.jpg
 /engine/models/*.yml
+**/__pycache__/
