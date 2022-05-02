@@ -22,6 +22,7 @@ class RegisterUserFaces(MethodView):
         user = User(name)
         db.session.add(user)
         db.session.commit()
+        
         return jsonify({user.id: {
             'name': user.name,
         }})
