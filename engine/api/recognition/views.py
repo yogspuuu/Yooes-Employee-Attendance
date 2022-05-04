@@ -43,7 +43,7 @@ class ValidateUserFaces(MethodView):
     def get(self, id=None):
         # Get the record for the provided id.
         return
-
+    
     def post(self, id=None):
         # get requested base64 image data
         base64_image = request.form.get('base64_image')
