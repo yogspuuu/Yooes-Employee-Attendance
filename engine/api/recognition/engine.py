@@ -81,7 +81,6 @@ def do_recognition(video_name: str) -> str:
                     else:
                         if not already_blink:
                             already_blink = True
-
             else:
                 id = None
                 confidence = "{0}%".format(round(100 - confidence))
