@@ -21,15 +21,15 @@ class RegisterUserFaces(MethodView):
 
     def post(self, id=None):
         name = request.form.get('name')
-        
+
         # save name into database
         user = User(name)
         db.session.add(user)
         db.session.commit()
-        
+
         # get requested base64 image data
         base64_video = request.form.get('base64_video')
-        
+
         # convert base64 to image
         video = b64_to_video(base64_video)
 
@@ -54,24 +54,19 @@ class ValidateUserFaces(MethodView):
     def get(self, id=None):
         # Get the record for the provided id.
         return
-    
+
     def post(self, id=None):
         # get requested base64 image data
         base64_video = request.form.get('base64_video')
-        
+
         # convert base64 to image
         video = b64_to_video(base64_video)
 
         # show result of prediction
         result_of_prediction = do_recognition(video)
 
-        # user = User.query.filter_by(id=id).first()
-        # if not user:
-        #     abort(404)
-            
         return jsonify({
             'data': result_of_prediction,
-            # 'name': user.name,
         })
 
     def put(self, id=None):

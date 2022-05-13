@@ -1,6 +1,5 @@
 import os
 import cv2
-from flask import abort
 from api import UPLOAD_FOLDER
 from api.recognition.models import User
 
@@ -40,7 +39,7 @@ def do_recognition(video_name: str) -> str:
 
     # variable store execution state
     already_blink = False
-        
+
     # Define min window size to be recognized as a face
     minW = 0.1*640
     minH = 0.1*480
@@ -89,7 +88,7 @@ def do_recognition(video_name: str) -> str:
 
         # break while video is already read
         break
-        
+
     # check if user is null or blink is false and return message
     if (id == None or already_blink == False):
         name = None
