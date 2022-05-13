@@ -12,8 +12,8 @@ class User(db.Model):
         return '<User %d>' % self.id
 
 
-class UserImages(db.Model):
+class UserVideos(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user = db.relationship('User', backref=db.backref('user', uselist=False))
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
-    image_name = db.Column(db.String)
+    video_name = db.Column(db.String)

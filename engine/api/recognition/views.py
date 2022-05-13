@@ -1,10 +1,10 @@
-import base64
 from api import db, app
 from flask.views import MethodView
 from api.recognition.models import User
-from flask import request, jsonify, Blueprint
-from api.recognition.utils import b64_to_image
-from api.recognition.recognition import do_recognition
+from api.recognition.utils import b64_to_video
+from api.recognition.engine import do_recognition
+from flask import abort, request, jsonify, Blueprint
+from api.recognition.engine import do_generate_datasets
 
 recognition = Blueprint('recognition', __name__)
 
@@ -15,26 +15,37 @@ def home():
 
 
 class RegisterUserFaces(MethodView):
-    def get(self, id):
+    def get(self, id=None):
         # Get the record for the provided id.
         return
 
-    def post(self):
+    def post(self, id=None):
         name = request.form.get('name')
+        
+        # save name into database
         user = User(name)
         db.session.add(user)
         db.session.commit()
+        
+        # get requested base64 image data
+        base64_video = request.form.get('base64_video')
+        
+        # convert base64 to image
+        video = b64_to_video(base64_video)
 
-        return jsonify({user.id: {
-            'name': user.name,
-        }})
+        # show result of prediction
+        result_of_capture = do_generate_datasets(user.id, user.name, video)
 
-    def put(self, id):
+        return jsonify({
+            'data': result_of_capture
+        })
+
+    def put(self, id=None):
         # Update the record for the provided id
         # with the details provided.
         return
 
-    def delete(self, id):
+    def delete(self, id=None):
         # Delete the record for the provided id.
         return
 
@@ -46,30 +57,29 @@ class ValidateUserFaces(MethodView):
     
     def post(self, id=None):
         # get requested base64 image data
-        base64_image = request.form.get('base64_image')
+        base64_video = request.form.get('base64_video')
         
         # convert base64 to image
-        image = b64_to_image(base64_image)
+        video = b64_to_video(base64_video)
 
         # show result of prediction
-        result_of_prediction = do_recognition(image)
+        result_of_prediction = do_recognition(video)
 
         # user = User.query.filter_by(id=id).first()
         # if not user:
         #     abort(404)
-        res = {
-            'id': result_of_prediction,
+            
+        return jsonify({
+            'data': result_of_prediction,
             # 'name': user.name,
-        }
-        
-        return jsonify(res)
+        })
 
-    def put(self, id):
+    def put(self, id=None):
         # Update the record for the provided id
         # with the details provided.
         return
 
-    def delete(self, id):
+    def delete(self, id=None):
         # Delete the record for the provided id.
         return
 

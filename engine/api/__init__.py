@@ -6,7 +6,7 @@ from flask_sqlalchemy import SQLAlchemy
 app = Flask(__name__)
 
 # Config for upload files   
-UPLOAD_FOLDER = f'{os.getcwd()}/../storage/app/recognition_image'
+UPLOAD_FOLDER = f'{os.getcwd()}/../storage/app/recognition_video'
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 # ALLOWED_EXTENSIONS = {'png', 'jpg', 'jpeg'}
 # def allowed_file(filename):
