@@ -1,9 +1,9 @@
 from api import db, app
 from flask.views import MethodView
 from api.recognition.models import User
+from flask import request, jsonify, Blueprint
 from api.recognition.utils import b64_to_video
 from api.recognition.engine import do_recognition
-from flask import abort, request, jsonify, Blueprint
 from api.recognition.engine import do_generate_datasets
 
 recognition = Blueprint('recognition', __name__)
