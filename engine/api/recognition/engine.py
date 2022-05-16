@@ -1,5 +1,8 @@
+from email.mime import image
 import os
 import cv2
+import numpy as np
+from PIL import Image
 from api import UPLOAD_FOLDER
 from api.recognition.models import User
 
@@ -116,6 +119,9 @@ def do_generate_datasets(id: int, name: str, video_name: str) -> str:
     # call cascade path
     cascade_path()
 
+    # datasets directory
+    dataset_path = f'{os.getcwd()}/datasets'
+
     # video directory
     video_path = os.path.join(UPLOAD_FOLDER, video_name)
 
@@ -152,8 +158,11 @@ def do_generate_datasets(id: int, name: str, video_name: str) -> str:
             count += 1
 
             # save the captured image into the datasets folder
-            cv2.imwrite(f'{os.getcwd()}/datasets/.' + str(face_id) + '.' +
-                        str(count) + ".jpg", gray[y:y+h, x:x+w])
+            cv2.imwrite(
+                f'{dataset_path}/.{str(face_id)}.{str(count)}.jpg', gray[y:y+h, x:x+w])
+
+    # generate models when registering faces
+    do_generate_models(dataset_path, face_id)
 
     # return collected data
     return {
@@ -162,5 +171,33 @@ def do_generate_datasets(id: int, name: str, video_name: str) -> str:
     }
 
 
-def do_generate_models(video_name: str) -> str:
-    pass
+def do_generate_models(image_path: str, face_id: str) -> str:
+    recognizer = cv2.face.LBPHFaceRecognizer_create()
+    detector = cv2.CascadeClassifier(
+        faceCascadePath
+    )
+
+    def get_images_and_labels(image_path: str, face_id: str) -> str:
+        imagePaths = [os.path.join(image_path, f) for f in os.listdir(image_path)]
+        faceSamples = []
+        ids = []
+
+        for imagePath in imagePaths:
+            PIL_img = Image.open(imagePath).convert('L')
+            img_numpy = np.array(PIL_img, 'uint8')
+
+            id = int(os.path.split(imagePath)[-1].split(".")[1])
+            faces = detector.detectMultiScale(img_numpy)
+
+            for (x, y, w, h) in faces:
+                faceSamples.append(img_numpy[y:y+h, x:x+w])
+                ids.append(id)
+
+        return faceSamples, ids
+    
+    faces, ids = get_images_and_labels(image_path, face_id)
+    recognizer.train(faces, np.array(ids))
+
+    # Save the model into models/model.yml
+    # recognizer.save() worked on Mac, but not on Pi
+    recognizer.write('models/model.yml')
